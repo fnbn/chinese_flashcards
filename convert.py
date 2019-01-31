@@ -1,4 +1,4 @@
-import re
+import regex
 import chardet
 
 field_names = ['nummer', 'zeichen', 'striche',
@@ -8,7 +8,7 @@ field_names = ['nummer', 'zeichen', 'striche',
 
 def read_in(file):
     with open(file, 'rb') as fp:
-        encoding = chardet.detect(fp.eead())
+        encoding = chardet.detect(fp.read())
     with open(file, encoding=encoding['encoding']) as fp:
         lines = fp.read()
     return lines.split('\n')[0:-1]
@@ -21,15 +21,16 @@ def split_examples(fields_set):
         # split by chinese characters
         # splitting by unicode properties like script=han unfortunately not
         # possible in standard re library
-        f[9] = re.split(r' (?=[^\w ,/=()])', f[9])
+        f[9] = regex.split('\P{script=han}(?=\\p{script=han})', f[9])
         # remove trailing commas
         f[9] = [x.rstrip(',') for x in f[9]]
         return f
     return [split_no_9(fields) for fields in fields_set]
 
 def apply_translate_command(fields_set):
-    command = '\\translation{{{}}}{{{}}}{{{}}}'
+    command = '  \\translation{{{}}}{{{}}}{{{}}}'
     def apply_to_no_9(f):
+        print(f[9])
         # split between '='
         f[9] = [field.split(' = ') for field in f[9]]
         # split first field between first character and rest
@@ -39,7 +40,7 @@ def apply_translate_command(fields_set):
         # remove leading space if present
         f[9] = [[field[0], field[1].lstrip(' '), field[2]] for field in f[9]]
         # format
-        f[9] = ''.join([command.format(*field) for field in f[9]])
+        f[9] = ',\n'.join([command.format(*field) for field in f[9]])
         return f
     return [apply_to_no_9(fields) for fields in fields_set]
 
@@ -47,10 +48,13 @@ def strip_surrounding_spaces(fields_set):
     return [[f.lstrip(' ').rstrip(' ') for f in field] for field in fields_set]
 
 def apply_overall_command(fields_set):
-    command = "\\renewcommand{{\\flfoot}}{{{striche} / {haeufigkeit}}}"
-    command = command + "\\card{{\\translate{{{zeichen}}}{{{aussprache}}}{{{bedeutung}}}\\\\[1em]a"
-    command = command + "{{{beispiele}}}\n"
+    command = "\\renewcommand{{\\flfoot}}{{\\scriptsize {striche} Strich{plural} / {haeufigkeit}}}\n"
+    command = command + "\\card{{{zeichen}}}{{\n"
+    command = command + "  \\translation{{}}{{{aussprache}}}{{{bedeutung}}}\\\\[1em]\n"
+    command = command + "  {beispiele}\n"
+    command = command + "}}\n"
     return [command.format(striche=fields[2],
+                           plural='e' if int(fields[2]) > 1 else '',
                            haeufigkeit=fields[7],
                            zeichen=fields[1],
                            aussprache=fields[4],
