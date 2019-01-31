@@ -1,4 +1,5 @@
-import  re
+import re
+import chardet
 
 field_names = ['nummer', 'zeichen', 'striche',
                'bedeutung', 'aussprache', 'anmerkungen',
@@ -6,7 +7,9 @@ field_names = ['nummer', 'zeichen', 'striche',
                'beispiele']
 
 def read_in(file):
-    with open(file) as fp:
+    with open(file, 'rb') as fp:
+        encoding = chardet.detect(fp.read())
+    with open(file, encoding=encoding['encoding']) as fp:
         lines = fp.read()
     return lines.split('\n')[0:-1]
 
