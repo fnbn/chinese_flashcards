@@ -1,0 +1,37 @@
+\documentclass[frontgrid,backgrid,a4paper,11pt]{flacards}
+
+\newcommand{\glqq}{„}
+\newcommand{\grqq}{"}
+
+% adapt margins
+\usepackage{geometry}
+\geometry{layouthoffset=0mm}
+\usepackage{bophook}
+\AtBeginPage{%
+  \ifodd\count0 \global\voffset=0.8mm \else \global\voffset=0mm \fi
+}
+
+\usepackage{etoolbox}
+\pretocmd{\card}{\def\curhint{#1}}{}{}
+
+% Chinese font
+\usepackage{xeCJK}
+\setCJKmainfont[BoldFont=FandolSong-Bold.otf,ItalicFont=FandolKai-Regular.otf]{FandolSong-Regular.otf}
+\setCJKsansfont[BoldFont=FandolHei-Bold.otf]{FandolHei-Regular.otf}
+\setCJKmonofont{FandolFang-Regular.otf}
+\setmainfont{Linux Libertine O}
+
+% define flash card style
+\pagesetup{3}{7} % columns and rows
+\renewcommand{\cardtextstylef}{\Huge}
+\renewcommand{\cardtextstyleb}{\large}
+\renewcommand{\frfoot}{\scriptsize \flashcardset}
+\renewcommand{\brfoot}{\scriptsize \flashcardset}
+\renewcommand{\flhead}{} %{\footnotesize\thecardno}
+\renewcommand{\brhead}{} %{\footnotesize\thecardno}
+
+% Temporarily disable new lines when displaying the front text also on the back
+% \renewcommand{\bcfoot}{\let\\\relax\footnotesize\curhint}
+
+% define custom card with three parameters for chinese character, pinyin and translation
+\newcommand{\custcard}[3]{\card{#1}{{\it #2} \\ #3}}
