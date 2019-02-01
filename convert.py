@@ -30,7 +30,6 @@ def split_examples(fields_set):
 def apply_translate_command(fields_set):
     command = '  \\translation{{{}}}{{{}}}{{{}}}'
     def apply_to_no_9(f):
-        print(f[9])
         # split between '='
         f[9] = [field.split(' = ') for field in f[9]]
         # split first field between first character and rest
@@ -50,7 +49,7 @@ def strip_surrounding_spaces(fields_set):
 def apply_overall_command(fields_set):
     command = "\\renewcommand{{\\flfoot}}{{\\scriptsize {striche} Strich{plural} / {haeufigkeit}}}\n"
     command = command + "\\card{{{zeichen}}}{{\n"
-    command = command + "  \\translation{{}}{{{aussprache}}}{{{bedeutung}}}\\\\[1em]\n"
+    command = command + "  \\maintranslation{{{aussprache}}}{{{bedeutung}}}\\\\[1em]\n"
     command = command + "  {beispiele}\n"
     command = command + "}}\n"
     return [command.format(striche=fields[2],
